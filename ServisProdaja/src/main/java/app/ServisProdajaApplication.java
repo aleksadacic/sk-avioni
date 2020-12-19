@@ -1,13 +1,13 @@
-package SK.ServisLetova;
+package app;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ServisLetovaApplication {
+public class ServisProdajaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ServisLetovaApplication.class, args);
+		SpringApplication.run(ServisProdajaApplication.class, args);
 	}
 
 }
