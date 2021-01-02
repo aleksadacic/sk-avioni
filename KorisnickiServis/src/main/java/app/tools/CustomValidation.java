@@ -19,13 +19,15 @@ public class CustomValidation {
 
 	public static boolean isOnlyLetters(String... str) {
 		for (String s : str) {
-			if (!s.matches("[a-zA-Z]+"))
+			if (!s.matches("[a-zA-Z ]+"))
 				return false;
 		}
 		return true;
 	}
 	
 	public static boolean validateEmail(String email) {
+		if (email.length() <= 0)
+			return false;
 		try {
 			InternetAddress e = new InternetAddress(email);
 			e.validate();
@@ -36,7 +38,7 @@ public class CustomValidation {
 	}
 
 	public static boolean validateUser(RegistrationForm rf) {
-		if (isOnlyLetters(rf.getIme(), rf.getPrezime()) && validateEmail(rf.getEmail()))
+		if (isOnlyLetters(rf.getIme(), rf.getPrezime()) && validateEmail(rf.getEmail()) && rf.getPasos().length() > 0 && rf.getPassword().length() > 0)
 			return true;
 		return false;
 	}
