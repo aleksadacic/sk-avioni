@@ -31,6 +31,17 @@ public class AdminController {
 		}
 	}
 	
+//	@PostMapping("/dodajAvion")
+//	public ResponseEntity<String> dodajAvion(@RequestBody Avion avion) {
+//		try {
+//			
+//			
+//			return new ResponseEntity<String>("success", HttpStatus.ACCEPTED);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//	}
 
 //	@PostMapping("/dodavanjeLetova")
 //	public ResponseEntity<String> dodajLet(@RequestBody LetForm letForm) {

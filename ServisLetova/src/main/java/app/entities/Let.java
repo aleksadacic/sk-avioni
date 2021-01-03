@@ -4,6 +4,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Let {
@@ -12,21 +15,30 @@ public class Let {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
+	@ManyToOne
+	@JoinColumn(name="avion")
 	private Avion avion;
+	
 	private String pocetnaDestinacija;
-	private String krajnjaDestincija;
+	private String krajnjaDestinacija;
 	private String duzinaLeta;
-	private String cena;
+	private double cena;
+	
+	//dodatni parametri
+	private int prodateKarte;
+	private boolean ponisten;
 	
 	public Let() {}
 	
-	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestincija, String duzinaLeta, String cena) {
+	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, double cena) {
 		super();
 		this.avion = avion;
 		this.pocetnaDestinacija = pocetnaDestinacija;
-		this.krajnjaDestincija = krajnjaDestincija;
+		this.krajnjaDestinacija = krajnjaDestinacija;
 		this.duzinaLeta = duzinaLeta;
 		this.cena = cena;
+		this.prodateKarte = 0;
+		this.ponisten = false;
 	}
 	
 
@@ -54,14 +66,6 @@ public class Let {
 		this.pocetnaDestinacija = pocetnaDestinacija;
 	}
 
-	public String getKrajnjaDestincija() {
-		return krajnjaDestincija;
-	}
-
-	public void setKrajnjaDestincija(String krajnjaDestincija) {
-		this.krajnjaDestincija = krajnjaDestincija;
-	}
-
 	public String getDuzinaLeta() {
 		return duzinaLeta;
 	}
@@ -70,12 +74,41 @@ public class Let {
 		this.duzinaLeta = duzinaLeta;
 	}
 
-	public String getCena() {
+	public double getCena() {
 		return cena;
 	}
 
-	public void setCena(String cena) {
+	public void setCena(double cena) {
 		this.cena = cena;
+	}
+	
+	public String getKrajnjaDestinacija() {
+		return krajnjaDestinacija;
+	}
+
+	public void setKrajnjaDestinacija(String krajnjaDestinacija) {
+		this.krajnjaDestinacija = krajnjaDestinacija;
+	}
+
+	public int getProdateKarte() {
+		return prodateKarte;
+	}
+
+	public void setProdateKarte(int prodateKarte) {
+		this.prodateKarte = prodateKarte;
+	}
+
+	public boolean isPonisten() {
+		return ponisten;
+	}
+
+	public void setPonisten(boolean ponisten) {
+		this.ponisten = ponisten;
+	}
+
+	@Override
+	public String toString() {
+		return pocetnaDestinacija + "-" + krajnjaDestinacija;
 	}
 
 }
