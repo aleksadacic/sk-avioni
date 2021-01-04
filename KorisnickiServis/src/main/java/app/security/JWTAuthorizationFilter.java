@@ -29,7 +29,6 @@ import app.repository.UserRepository;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 	private UserRepository userRepo;
-
 	@Autowired
 	public JWTAuthorizationFilter(AuthenticationManager authManager, UserRepository userRepo) {
 		super(authManager);
@@ -49,7 +48,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	}
 
 	private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request, String token) {
-
 		if (token != null) {
 			// parsiranje tokena
 			DecodedJWT jwt = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()

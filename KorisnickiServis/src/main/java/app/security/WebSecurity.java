@@ -12,6 +12,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import app.repository.AdminRepository;
 import app.repository.UserRepository;
 
 import static app.security.SecurityConstants.*;
@@ -25,6 +26,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	private BCryptPasswordEncoder encoder;
 	private UserRepository userRepo;
 
+	
 	@Autowired
 	public WebSecurity(CustomAuthenticationProvider customAuthenticationProvider, UserRepository userRepo,
 			BCryptPasswordEncoder encoder) {

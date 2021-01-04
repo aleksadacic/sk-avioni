@@ -16,4 +16,7 @@ public interface LetRepository extends JpaRepository<Let, Long> {
 	
 	@Query("select let from Let let where let.avion.kapacitet >= let.prodateKarte")
 	List<Let> findNotFull();
+	
+	@Query("select let from Let let where let.avion.id = :id")
+	List<Let> findByAvion(long id);
 }

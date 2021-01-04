@@ -33,5 +33,4 @@ public class UtilsMethods {
 
 		return response;
 	}
-
 }

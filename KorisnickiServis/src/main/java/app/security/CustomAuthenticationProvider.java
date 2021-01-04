@@ -11,8 +11,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import app.entities.Admin;
 import app.entities.User;
+import app.repository.AdminRepository;
 import app.repository.UserRepository;
+import app.tools.CustomValidation;
 
 @Component
 public class CustomAuthenticationProvider implements AuthenticationProvider {
@@ -30,18 +33,16 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication auth) throws AuthenticationException {
 		String email = auth.getName();
 		String password = auth.getCredentials().toString();
-
+		
 		User user = userRepo.findByEmail(email);
-
-		if (user == null) {
+		if (user == null)
 			throw new BadCredentialsException("Authentication failed");
-		}
-
 		// proveri sifru
 		if (encoder.matches(password, user.getSifra())) {
 			return new UsernamePasswordAuthenticationToken(email, password, emptyList());
 		}
-
+		
+		
 		throw new BadCredentialsException("Authentication failed");
 	}
 
