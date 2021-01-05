@@ -20,6 +20,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import app.repository.AdminRepository;
 import app.repository.UserRepository;
 
 /**
@@ -29,10 +30,13 @@ import app.repository.UserRepository;
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 	private UserRepository userRepo;
+	private AdminRepository adminRepo;
+	
 	@Autowired
-	public JWTAuthorizationFilter(AuthenticationManager authManager, UserRepository userRepo) {
+	public JWTAuthorizationFilter(AuthenticationManager authManager, UserRepository userRepo, AdminRepository adminRepo) {
 		super(authManager);
 		this.userRepo = userRepo;
+		this.adminRepo = adminRepo;
 	}
 
 	@Override
@@ -58,7 +62,9 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
 			// Provera da li se nalazi user u bazi
 			if (userRepo.existsByEmail(email) == false) {
-				return null;
+				if (adminRepo.existsByEmail(email) == false) {
+					return null;
+				}
 			}
 
 			if (email != null) {

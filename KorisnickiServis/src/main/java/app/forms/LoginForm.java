@@ -1,6 +1,6 @@
 package app.forms;
 
-public class LoginForm {
+public class LoginForm{
 
 	private String email;
 	private String password;
@@ -28,5 +28,4 @@ public class LoginForm {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 }
