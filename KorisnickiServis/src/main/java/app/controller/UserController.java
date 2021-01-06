@@ -102,10 +102,15 @@ public class UserController {
 			String stari = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
 					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
 			UserClient user = (UserClient) userRepo.findByEmail(stari);
+			
+			if (user == null)
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
 			if (registrationForm.getEmail().equalsIgnoreCase(stari)
 					|| (userRepo.findByEmail(registrationForm.getEmail()) != null
 							&& !userRepo.findByEmail(registrationForm.getEmail()).getEmail().equalsIgnoreCase(stari)))
 				return new ResponseEntity<String>("email exists", HttpStatus.BAD_REQUEST);
+			
 
 			if (!registrationForm.getEmail().equalsIgnoreCase(stari))
 				mailchanged = true;
@@ -147,8 +152,8 @@ public class UserController {
 			String stari = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
 					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
 			UserClient user = (UserClient) userRepo.findByEmail(stari);
-//			if (user == null)
-////				return new ResponseEntity<String>
+			if (user == null)
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
 			KreditnaKartica kartica = new KreditnaKartica(karticaForm.getIme(), karticaForm.getPrezime(),
 					karticaForm.getBrojKartice(), karticaForm.getSigurnosniBroj());
@@ -173,8 +178,11 @@ public class UserController {
 
 			String stari = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
 					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
-			UserClient user = (UserClient) userRepo.findByEmail(stari);
+			UserClient user = userRepo.findByEmail(stari);
 			RankKorisnika rank = userRepo.findRankKorisnika(user);
+			
+			if (user == null)
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
 			rank.setNaziv(rankForm.getNaziv());
 			rank.setPoeni(rankForm.getPoeni());
@@ -187,31 +195,35 @@ public class UserController {
 		}
 	}
 
-	// mora prvo login da se dobije header token
-	@GetMapping("/whoAmI")
-	public ResponseEntity<UserInfo> whoAmI(@RequestHeader(value = HEADER_STRING) String token) {
-		try {
-
-			// izvlacimo iz tokena subject koj je postavljen da bude email
-			String email = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
-					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
-
-			UserClient user = (UserClient) userRepo.findByEmail(email);
-
-			return new ResponseEntity<>(new UserInfo(user.getIme(), user.getPrezime(), user.getRankKorisnika()),
-					HttpStatus.ACCEPTED);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-		}
-	}
+//	// mora prvo login da se dobije header token
+//	@GetMapping("/whoAmI")
+//	public ResponseEntity<UserInfo> whoAmI(@RequestHeader(value = HEADER_STRING) String token) {
+//		try {
+//
+//			// izvlacimo iz tokena subject koj je postavljen da bude email
+//			String email = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
+//					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
+//
+//			UserClient user = (UserClient) userRepo.findByEmail(email);
+//
+//			return new ResponseEntity<>(new UserInfo(user.getIme(), user.getPrezime(), user.getRankKorisnika()),
+//					HttpStatus.ACCEPTED);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//		}
+//	}
 
 	@GetMapping("/findFlight/{query}")
-	public ResponseEntity<Object> pretragaLetova(@PathVariable String query) {
+	public ResponseEntity<Object> pretragaLetova(@RequestHeader(value = HEADER_STRING) String token, @PathVariable String query) {
 		try {
-			// KORISNIK
+			
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
 			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/pretraga/" + query,
 					null);
+			
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();

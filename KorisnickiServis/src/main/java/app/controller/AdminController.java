@@ -4,6 +4,8 @@ import static app.security.SecurityConstants.HEADER_STRING;
 import static app.security.SecurityConstants.SECRET;
 import static app.security.SecurityConstants.TOKEN_PREFIX;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import app.entities.Admin;
 import app.forms.AvionForm;
+import app.forms.LetForm;
 import app.repository.AdminRepository;
 import app.utils.UtilsMethods;
 
@@ -47,7 +50,7 @@ public class AdminController {
 		try {
 			if (!authorityCheck(token))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-			return UtilsMethods.sendPost("http://localhost:8081/letovi/dodajAvion", form);
+			return UtilsMethods.sendPost("http://localhost:8081/letovi/dodajAvion", form, Map.of("Authorization", token));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -59,7 +62,30 @@ public class AdminController {
 		try {
 			if (!authorityCheck(token))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-			return UtilsMethods.sendGet("http://localhost:8081/letovi/obrisiAvion/" + avion, null);
+			return UtilsMethods.sendGet("http://localhost:8081/letovi/obrisiAvion/" + avion, Map.of("Authorization", token));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@PostMapping("/dodajLet")
+	public ResponseEntity<Object> dodajLet(@RequestHeader(value = HEADER_STRING) String token, LetForm form) {
+		try {
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			return UtilsMethods.sendPost("http://localhost:8081/letovi/dodajLet", form, Map.of("Authorization" ,token));
+		} catch (Exception e) {
+		}
+		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+	}
+	
+	@GetMapping("/obrisiLet/{let}")
+	public ResponseEntity<Object> obrisiLet(@RequestHeader(value = HEADER_STRING) String token, @PathVariable long let) {
+		try {
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			return UtilsMethods.sendGet("http://localhost:8081/letovi/obrisiLet/" + let, Map.of("Authorization", token));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
