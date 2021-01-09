@@ -1,22 +1,18 @@
 package app.forms;
 
-public class RegistrationForm {
+public class RegisterForm {
 	private String ime;
 	private String prezime;
 	private String email;
 	private String password;
 	private String pasos;
 
-	public RegistrationForm(String ime, String prezime, String email, String password, String pasos) {
+	public RegisterForm(String ime, String prezime, String email, String password, String pasos) {
 		this.ime = ime;
 		this.prezime = prezime;
 		this.email = email;
 		this.password = password;
 		this.pasos = pasos;
-	}
-
-	public RegistrationForm() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public String getIme() {

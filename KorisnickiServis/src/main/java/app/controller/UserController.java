@@ -4,7 +4,8 @@ import static app.security.SecurityConstants.HEADER_STRING;
 import static app.security.SecurityConstants.SECRET;
 import static app.security.SecurityConstants.TOKEN_PREFIX;
 
-import javax.annotation.security.RolesAllowed;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +29,6 @@ import app.entities.UserClient;
 import app.forms.KarticaForm;
 import app.forms.RankForm;
 import app.forms.RegistrationForm;
-import app.forms.UserInfo;
 import app.repository.KarticaRepository;
 import app.repository.RankRepository;
 import app.repository.UserRepository;
@@ -58,7 +58,7 @@ public class UserController {
 		this.karticaRepo = karticaRepo;
 		this.esi = esi;
 	}
-
+	
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody RegistrationForm registrationForm) {
 		if (userRepo.existsByEmail(registrationForm.getEmail())) {
@@ -195,25 +195,6 @@ public class UserController {
 		}
 	}
 
-//	// mora prvo login da se dobije header token
-//	@GetMapping("/whoAmI")
-//	public ResponseEntity<UserInfo> whoAmI(@RequestHeader(value = HEADER_STRING) String token) {
-//		try {
-//
-//			// izvlacimo iz tokena subject koj je postavljen da bude email
-//			String email = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
-//					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
-//
-//			UserClient user = (UserClient) userRepo.findByEmail(email);
-//
-//			return new ResponseEntity<>(new UserInfo(user.getIme(), user.getPrezime(), user.getRankKorisnika()),
-//					HttpStatus.ACCEPTED);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//		}
-//	}
-
 	@GetMapping("/findFlight/{query}")
 	public ResponseEntity<Object> pretragaLetova(@RequestHeader(value = HEADER_STRING) String token, @PathVariable String query) {
 		try {
@@ -225,6 +206,42 @@ public class UserController {
 					null);
 			
 			return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/sviLetovi")
+	public ResponseEntity<Object> sviLetovi(@RequestHeader(value = HEADER_STRING) String token) {
+		try {
+			
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/sviLetovi",
+					Map.of("Authorization", token));
+			
+			return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/findKartice")
+	public ResponseEntity<Object> findKartice(@RequestHeader(value = HEADER_STRING) String token) {
+		try {
+			
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			String email = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
+					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
+			UserClient user = userRepo.findByEmail(email);
+			List<KreditnaKartica> response = karticaRepo.findByUser(user);
+			
+			return new ResponseEntity<Object>(response, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
