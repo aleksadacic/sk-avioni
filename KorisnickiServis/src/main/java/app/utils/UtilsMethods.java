@@ -4,11 +4,8 @@ import java.util.Map;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
-
-import app.forms.AvionForm;
 
 public class UtilsMethods {
 
@@ -35,7 +32,6 @@ public class UtilsMethods {
 			headers.add(entry.getKey(), entry.getValue());
 		}
 		headers.add("Content-Type", "application/json");
-		System.out.println(((AvionForm)body).getNaziv());
 
 		HttpEntity<Object> entity = new HttpEntity<Object>(body, headers);
 

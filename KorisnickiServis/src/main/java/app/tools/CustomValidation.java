@@ -46,11 +46,21 @@ public class CustomValidation {
 	public static boolean validateRank(RankForm rf) {
 		if (rf.getNaziv().equals(RankType.BRONZA) && rf.getPoeni() < 1000)
 			return true;
-		if (rf.getNaziv().equals(RankType.SREBRO) && rf.getPoeni() > 1000 && rf.getPoeni() < 10000)
+		if (rf.getNaziv().equals(RankType.SREBRO) && rf.getPoeni() >= 1000 && rf.getPoeni() < 10000)
 			return true;
-		if (rf.getNaziv().equals(RankType.ZLATO) && rf.getPoeni() > 10000)
+		if (rf.getNaziv().equals(RankType.ZLATO) && rf.getPoeni() >= 10000)
 			return true;
 		return false;
+	}
+	
+	public static String getRank(long poeni) {
+		if (poeni < 1000)
+			return RankType.BRONZA;
+		if (poeni >= 1000 && poeni < 10000)
+			return RankType.SREBRO;
+		if (poeni >= 10000)
+			return RankType.ZLATO;
+		return null;
 	}
 
 	public static boolean validateCard(KarticaForm kf) {

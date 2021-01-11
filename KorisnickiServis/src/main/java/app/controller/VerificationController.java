@@ -75,6 +75,7 @@ public class VerificationController {
 				rf.setRankNaziv(uc.getRankKorisnika().getNaziv());
 				rf.setRankPoeni(uc.getRankKorisnika().getPoeni() + "");
 			}
+			else throw new Exception();
 			
 			return new ResponseEntity<UserInfo>(rf, HttpStatus.ACCEPTED);
 		} catch (Exception e) {

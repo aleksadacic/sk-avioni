@@ -1,11 +1,15 @@
 package app.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.jms.Queue;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import app.entities.Avion;
 import app.entities.Let;
@@ -105,13 +111,17 @@ public final class LetController {
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			
 			Avion avion = avionRepo.findById(form.getAvion());
-			Let let = new Let(avion, form.getPocetnaDestinacija(), form.getKrajnjaDestinacija(), form.getDuzinaLeta(), form.getCena());
+			Let let = new Let(avion, form.getPocetnaDestinacija(), form.getKrajnjaDestinacija(), Long.parseLong(form.getDuzinaLeta()), form.getCena());
 			let = letRepo.save(let);
 			return new ResponseEntity<Let>(let, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	// mesidj broker
+	@Autowired JmsTemplate jmsTemplate;
+	@Autowired Queue korisnickiQueue;
 	
 	@GetMapping("/obrisiLet/{let}")
 	public ResponseEntity<Long> obrisiLet(@RequestHeader(value = "Authorization") String token, @PathVariable long let) {
@@ -121,13 +131,20 @@ public final class LetController {
 			
 			Let l = letRepo.findById(let);
 			if (l.getProdateKarte() > 0) {
-				//message broker
+				ObjectMapper om = new ObjectMapper();
+				HashMap<String, Object> hm = new HashMap<String, Object>();
+				hm.put("duzina", l.getDuzinaLeta());
+				hm.put("token", token);
+//				for (long user : users) {
+//					hm.put("user", value)
+//					String json = om.writeValueAsString(hm);
+//					jmsTemplate.convertAndSend(korisnickiQueue, json);
+//				}
+				//servisu 3 isto
 			}
-			else {
-				letRepo.delete(l);
-				return new ResponseEntity<Long>(let, HttpStatus.ACCEPTED);
-			}
-			throw new Exception();
+			
+			letRepo.delete(l);
+			return new ResponseEntity<Long>(let, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}

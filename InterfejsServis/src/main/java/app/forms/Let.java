@@ -9,12 +9,12 @@ public class Let {
 	
 	private String pocetnaDestinacija;
 	private String krajnjaDestinacija;
-	private String duzinaLeta;
+	private long duzinaLeta;
 	private double cena;
 	
 	public Let() {}
 	
-	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, double cena) {
+	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestinacija, long duzinaLeta, double cena) {
 		super();
 		this.avion = avion;
 		this.pocetnaDestinacija = pocetnaDestinacija;
@@ -48,11 +48,11 @@ public class Let {
 		this.pocetnaDestinacija = pocetnaDestinacija;
 	}
 
-	public String getDuzinaLeta() {
+	public long getDuzinaLeta() {
 		return duzinaLeta;
 	}
 
-	public void setDuzinaLeta(String duzinaLeta) {
+	public void setDuzinaLeta(long duzinaLeta) {
 		this.duzinaLeta = duzinaLeta;
 	}
 

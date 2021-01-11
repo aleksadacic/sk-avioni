@@ -69,4 +69,5 @@ public class UserInfo {
 	public void setRankPoeni(String rankPoeni) {
 		this.rankPoeni = rankPoeni;
 	}
+
 }

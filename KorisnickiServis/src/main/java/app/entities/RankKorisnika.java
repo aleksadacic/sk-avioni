@@ -15,7 +15,7 @@ public class RankKorisnika {
 	private long id;
 	
 	private String naziv;
-	private int poeni;
+	private long poeni;
 	
 	public RankKorisnika() {
 		this.naziv = RankType.BRONZA;
@@ -38,11 +38,11 @@ public class RankKorisnika {
 		this.naziv = naziv;
 	}
 
-	public int getPoeni() {
+	public long getPoeni() {
 		return poeni;
 	}
 
-	public void setPoeni(int poeni) {
+	public void setPoeni(long poeni) {
 		this.poeni = poeni;
 	}
 	

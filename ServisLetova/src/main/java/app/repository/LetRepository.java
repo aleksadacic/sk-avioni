@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import app.entities.Avion;
 import app.entities.Let;
 
 public interface LetRepository extends JpaRepository<Let, Long> {

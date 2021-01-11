@@ -3,13 +3,13 @@ package app.forms;
 public class RankForm {
 	
 	private String naziv;
-	private int poeni;
+	private long poeni;
 	
 	public RankForm() {
 		
 	}
 	
-	public RankForm(String naziv, int poeni) {
+	public RankForm(String naziv, long poeni) {
 		this.naziv = naziv;
 		this.poeni = poeni;
 	}
@@ -22,11 +22,11 @@ public class RankForm {
 		this.naziv = naziv;
 	}
 
-	public int getPoeni() {
+	public long getPoeni() {
 		return poeni;
 	}
 
-	public void setPoeni(int poeni) {
+	public void setPoeni(long poeni) {
 		this.poeni = poeni;
 	}
 

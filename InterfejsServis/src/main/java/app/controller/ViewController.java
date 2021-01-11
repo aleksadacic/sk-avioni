@@ -6,19 +6,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import app.forms.Avion;
 import app.forms.CreditCard;
+import app.forms.EditProfileForm;
 import app.forms.Let;
 import app.forms.LoginForm;
 import app.forms.UserInfo;
+import app.tools.CustomValidation;
 import app.utils.CustomTools;
 import app.utils.UtilsMethods;
 
@@ -28,35 +36,48 @@ public class ViewController {
 
 	
 	@GetMapping("/login")
-	public String loginPage(Model model) {
-		model.addAttribute("message", "hello");
+	public String loginPage() {
 		return "login";
 	}
 	
+	private String token = "";
 	
 	@PostMapping("")
-	public String loginEnter(@RequestParam String email, @RequestParam String password, Model model) {
+	public String loginEnter(@RequestParam String email, @RequestParam String password) {
 		try {
-			ResponseEntity<Object> res = UtilsMethods.sendPost("http://localhost:8080/login", new LoginForm(email, password), null);
+			LoginForm loginform = new LoginForm(email, password);
+			ResponseEntity<Object> res = UtilsMethods.sendPost("http://localhost:8080/login", loginform, null);
 			if (res != null) {
-				String token = res.getHeaders().getValuesAsList("Authorization").get(0);
-				UserInfo info = fillUserInfo(token);
-				if (info.getEmail().equals("admin"))
-					return "admin-page";
-				else {
-					model.addAttribute("fullname", info.getIme() + " " + info.getPrezime());
-					List<Let> letovi = getFlights(token);
-					model.addAttribute("flights", letovi);
-					List<CreditCard> kartice = getCreditCards(token);
-					model.addAttribute("cards", kartice);
-					int discount = CustomTools.calculateDiscount(info.getRankNaziv());
-					model.addAttribute("discount", discount);
-					return "index";
-				}
+				token = res.getHeaders().getValuesAsList("Authorization").get(0);
+				return "redirect:";
 			}
-			return "login";
+			return "redirect:login";
+			
 		} catch (Exception e) {
-			return "login";
+			e.printStackTrace();
+			return "redirect:login";
+		}
+	}
+	
+	@GetMapping("")
+	public String homepage(Model model) {
+		try {
+			UserInfo info = fillUserInfo(token); //error
+			if (info.getEmail().equals("admin"))
+				return "admin-page";
+			else {
+				model.addAttribute("fullname", info.getIme() + " " + info.getPrezime());
+				List<Let> letovi = getFlights(token);
+				model.addAttribute("flights", letovi);
+				List<CreditCard> kartice = getCreditCards(token);
+				model.addAttribute("cards", kartice);
+				int discount = CustomTools.calculateDiscount(info.getRankNaziv());
+				model.addAttribute("discount", discount);
+				return "index";
+			}			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "redirect:login";
 		}
 	}
 	
@@ -65,9 +86,50 @@ public class ViewController {
 		return "register";
 	}
 	
+	@GetMapping("/editProfile")
+	public String editProfilePage(Model model) {
+		UserInfo info = fillUserInfo(token);
+		System.out.println(info.getIme());
+		EditProfileForm epf = new EditProfileForm();
+		epf.setFirstName(info.getIme());
+		epf.setLastName(info.getPrezime());
+		epf.setEmail(info.getEmail());
+		epf.setPassport(info.getPasos());
+		model.addAttribute("rank", info.getRankNaziv());
+		model.addAttribute("points", info.getRankPoeni());
+		model.addAttribute("updated", epf);
+		CreditCard cc = new CreditCard();
+		model.addAttribute("kartica", cc);
+		model.addAttribute("cards", getCreditCards(token));
+		return "editprofile";
+	}
+	
+	@PostMapping("/submitKartica")
+	public String newCreditCard(@ModelAttribute CreditCard kartica) {
+		try {
+			ResponseEntity<Object> res = UtilsMethods.sendPost("http://localhost:8080/addCreditCard", kartica, Map.of("Authorization", token));
+			if (!res.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+				throw new Exception();
+			}
+			return "redirect:editProfile";			
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "editProfile"; //errors
+		}		
+	}
+	
+	
+	@PostMapping("/submitEditProfile")
+	public String submitProfile(@ModelAttribute EditProfileForm updated) {
+		return "redirect:editProfile";
+	}
+	
 	@SuppressWarnings("unchecked")
 	private UserInfo fillUserInfo(String token) {
-		ResponseEntity<Object> type = UtilsMethods.sendGet("http://localhost:8080/verify/usertype", Map.of("Authorization", token));
+		ResponseEntity<Object> type = UtilsMethods.sendGet("http://localhost:8080/verify/usertype", Map.of("Authorization", token)); //error
+		if (!type.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+			return null;
+		}
 		LinkedHashMap<String, String> lhm = (LinkedHashMap<String, String>) type.getBody();
 		UserInfo info = new UserInfo();
 		for (Entry<String, String> entry : lhm.entrySet()) {
@@ -90,6 +152,9 @@ public class ViewController {
 	@SuppressWarnings("unchecked")
 	private List<Let> getFlights(String token) {
 		ResponseEntity<Object> get = UtilsMethods.sendGet("http://localhost:8080/sviLetovi", Map.of("Authorization", token));
+		if (!get.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+			return null;
+		}
 		List<Object> svi = (List<Object>)get.getBody();
 		List<Let> letovi = new ArrayList<Let>();
 		for (Object s : svi) {
@@ -111,7 +176,7 @@ public class ViewController {
 				if (entry.getKey().equals("krajnjaDestinacija"))
 					let.setKrajnjaDestinacija((String) entry.getValue());
 				if (entry.getKey().equals("duzinaLeta"))
-					let.setDuzinaLeta((String) entry.getValue());
+					let.setDuzinaLeta(Long.parseLong(entry.getValue().toString()));
 				if (entry.getKey().equals("cena"))
 					let.setCena((double) entry.getValue());
 			}
@@ -123,6 +188,9 @@ public class ViewController {
 	@SuppressWarnings("unchecked")
 	private List<CreditCard> getCreditCards(String token) {
 		ResponseEntity<Object> get = UtilsMethods.sendGet("http://localhost:8080/findKartice", Map.of("Authorization", token));
+		if (!get.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+			return null;
+		}
 		List<Object> svi = (List<Object>)get.getBody();
 		List<CreditCard> kartice = new ArrayList<CreditCard>();
 		for (Object s : svi) {
@@ -141,6 +209,17 @@ public class ViewController {
 			kartice.add(kartica);
 		}
 		return kartice;
+	}
+	
+	ObjectMapper om = new ObjectMapper();
+	private String toJson(Object o) {
+		try {
+			return om.writeValueAsString(o);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 }

@@ -143,7 +143,7 @@ public class UserController {
 	}
 
 	@PostMapping("/addCreditCard")
-	public ResponseEntity<String> dodajKarticu(@RequestHeader(value = HEADER_STRING) String token,
+	public ResponseEntity<Boolean> dodajKarticu(@RequestHeader(value = HEADER_STRING) String token,
 			@RequestBody KarticaForm karticaForm) {
 		try {
 			if (!CustomValidation.validateCard(karticaForm))
@@ -164,9 +164,9 @@ public class UserController {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
 		}
-		return new ResponseEntity<String>("success", HttpStatus.ACCEPTED);
+		return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
 	}
 
 	@PostMapping("/updateRank")
@@ -184,15 +184,19 @@ public class UserController {
 			if (user == null)
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
-			rank.setNaziv(rankForm.getNaziv());
-			rank.setPoeni(rankForm.getPoeni());
-			rankRepo.save(rank);
-
+			rankUpdater(rank, rankForm);
+			
 			return new ResponseEntity<String>("success", HttpStatus.ACCEPTED);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
+	}
+	
+	public void rankUpdater(RankKorisnika rank, RankForm rankForm) {
+		rank.setNaziv(rankForm.getNaziv());
+		rank.setPoeni(rankForm.getPoeni());
+		rankRepo.save(rank);
 	}
 
 	@GetMapping("/findFlight/{query}")
