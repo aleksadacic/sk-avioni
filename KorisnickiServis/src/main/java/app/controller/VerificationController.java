@@ -47,7 +47,7 @@ public class VerificationController {
 			}
 			return new ResponseEntity<Boolean>(verify, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<Boolean>(false, HttpStatus.BAD_REQUEST);
 		}
 	}
 	

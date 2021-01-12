@@ -3,10 +3,12 @@ $('#myTable tbody tr').click(function() {
     $(this).addClass('bg-success').siblings().removeClass('bg-success');
     let x = $(this).find("td")[0];
     $("#selected-flight").val(x.textContent);
+    $("#flightid").val($(this).find("td")[4].textContent);
     let price = $(this).find("td")[3].textContent;
     let disc = $("#discount").text();
     let wdisc = parseFloat(price) - (parseFloat(price) * parseInt(disc) / 100);
     $("#flight-price").val(wdisc.toFixed(2));
+    $("#cardid").val($("#selectcard").val());
 });
 
 $('#loginbutton').click(function() {
@@ -17,3 +19,9 @@ $('#loginbutton').click(function() {
     	$('#login-form').submit();
     }
 });
+
+$("#selectcard").change(function(){
+
+    $("#cardid").val($(this).val());
+
+}); 

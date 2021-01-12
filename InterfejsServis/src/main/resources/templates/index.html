@@ -62,6 +62,7 @@
                             <td th:text="${flight.duzinaLeta}"></td>
                             <td th:text="${flight.avion}"></td>
                             <td th:text="${flight.cena}"></td>
+                            <td class="d-none" th:text="${flight.id}"></td>
                           </tr>
 
                         </tbody>
@@ -85,18 +86,20 @@
             <div class="col-6">
                 <h1>Purchase Flight</h1>
                 <div class="container">
-                    <form class="row g-4 d-flex flex-column">
+                    <form th:action="@{/buyTicketSubmit}" class="row g-4 d-flex flex-column" th:object="${kupilet}" method="post">
                         <div class="col-auto">
                           <label for="staticEmail2" class="">Selected Flight</label>
                           <input type="text" readonly class="form-control-plaintext fw-bold" id="selected-flight" value="">
+                          <input type="hidden" th:field="*{flightId}" readonly class="form-control-plaintext fw-bold" id="flightid" value="">
                         </div>
                         <div class="col-auto">
                             <label for="exampleDataList" class="form-label">Credit Card</label>
-                            <select class="form-select fw-bold" aria-label="Default select example">
-                            	<div th:each="card : ${cards}" >
-	                                <option value="1" th:text="${card.brojKartice}"></option>
+                            <select class="form-select fw-bold" aria-label="Default select example" id="selectcard">
+                            	<div th:each="card : ${cards}">
+	                                <option value="1" th:text="${card.id}"></option>
                             	</div>
                              </select>
+                             <input type="hidden" th:field="*{cardId}" readonly class="form-control-plaintext fw-bold" id="cardid" value="">
                              <div class="btn btn-primary mt-2 bg-secondary" id="new-card-button">Add New</div>
                         </div>
                         <div class="col-auto">

@@ -3,6 +3,7 @@ package app.forms;
 
 public class CreditCard {
 	
+	private Long id;
 	private String ime;
 	private String prezime;
 	private String brojKartice;
@@ -50,6 +51,14 @@ public class CreditCard {
 
 	public void setSigurnosniBroj(String sigurnosniBroj) {
 		this.sigurnosniBroj = sigurnosniBroj;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
 	}
 	
 	

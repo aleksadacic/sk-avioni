@@ -42,14 +42,15 @@ public final class LetController {
 	}
 	
 	@GetMapping("/sviLetovi")
-	public ResponseEntity<List<Let>> sviLetovi(@RequestHeader(value = "Authorization") String token) {
+	public ResponseEntity<Object> sviLetovi(@RequestHeader(value = "Authorization") String token) {
 		try {
 			if (!verifyUser(token, "user"))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			
 			List<Let> letovi = letRepo.findNotFull();
-			return new ResponseEntity<List<Let>>(letovi, HttpStatus.ACCEPTED);
+			return new ResponseEntity<Object>(letovi, HttpStatus.ACCEPTED);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -159,6 +160,7 @@ public final class LetController {
 		} catch (Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
 		}
+
 	}
 	
 	@PostMapping("/dodajAvion")

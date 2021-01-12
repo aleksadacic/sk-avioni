@@ -62,6 +62,19 @@ public class UserController {
 		this.esi = esi;
 	}
 	
+	@GetMapping("/test")
+    public ResponseEntity<String> addition() {
+
+
+        try {
+            return new ResponseEntity<String>("SERVICE 2", HttpStatus.ACCEPTED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+        }
+
+    }
+	
 	@PostMapping("/register")
 	public ResponseEntity<String> register(@RequestBody RegistrationForm registrationForm) {
 		if (userRepo.existsByEmail(registrationForm.getEmail())) {
@@ -96,8 +109,6 @@ public class UserController {
 	@PostMapping("/editProfile")
 	public ResponseEntity<String> editProfile(@RequestHeader(value = HEADER_STRING) String token,
 			@RequestBody RegistrationForm registrationForm) {
-		if (!CustomValidation.validateUser(registrationForm))
-			return new ResponseEntity<String>("invalid parameters", HttpStatus.BAD_REQUEST);
 
 		boolean mailchanged = false;
 		try {
@@ -255,12 +266,12 @@ public class UserController {
 	@GetMapping("/sviLetovi")
 	public ResponseEntity<Object> sviLetovi(@RequestHeader(value = HEADER_STRING) String token) {
 		try {
-			
+			System.out.println("user:");
 			if (!authorityCheck(token))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-			
-			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/sviLetovi",
-					Map.of("Authorization", token));
+			System.out.println("user:authorized");
+			System.out.println(token);
+			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/sviLetovi", Map.of("Authorization", token));
 			
 			return response;
 		} catch (Exception e) {

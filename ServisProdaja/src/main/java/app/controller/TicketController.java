@@ -60,7 +60,7 @@ public class TicketController {
 		}
 	}
 	
-	@PostMapping("/buyTicket")
+	@PostMapping("/listAllTickets")
 	public ResponseEntity<Object> listAllTickets(@RequestHeader(value = "Authorization") String token) {
 		try {
 			if (!verifyUser(token, "user"))
