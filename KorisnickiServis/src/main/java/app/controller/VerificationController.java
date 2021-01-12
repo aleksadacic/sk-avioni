@@ -89,4 +89,22 @@ public class VerificationController {
 		}
 	}
 	
+	@GetMapping("/userId")
+	public ResponseEntity<Long> getId(@RequestHeader(value = HEADER_STRING) String token) {
+		try {
+			String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
+					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
+			Long userId = null;
+			User x = userRepo.findByEmail(user);
+			if (userRepo.existsByEmail(user)) {
+				userId = x.getId();
+			} else {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+			}
+			
+			return new ResponseEntity<Long>(userId, HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 }
