@@ -1,6 +1,7 @@
 package app.controller;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -51,21 +52,23 @@ public class TicketController {
 			ResponseEntity<Object> update = UtilsMethods.sendGet("http://localhost:8081/letovi/updateMiles/" + body.getPoints(), Map.of("Authorization", token));
 			
 			ticketRepo.saveAndFlush(t);
-			return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
+			if (update.getBody().equals("success"))
+				return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		} catch(Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
 	
 	@PostMapping("/buyTicket")
-	public ResponseEntity<Boolean> listAllTickets(@RequestHeader(value = "Authorization") String token) {
+	public ResponseEntity<Object> listAllTickets(@RequestHeader(value = "Authorization") String token) {
 		try {
 			if (!verifyUser(token, "user"))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-//			Long userId = 
-			// leksa kidamo
-
-			return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
+			ResponseEntity<Object> id = UtilsMethods.sendGet("http://localhost:8081/letovi/userId", Map.of("Authorization", token));
+			List<Ticket> tickets = ticketRepo.findTicketsById((long) id.getBody());
+			
+			return new ResponseEntity<Object>(tickets, HttpStatus.ACCEPTED);
 		} catch(Exception e) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
