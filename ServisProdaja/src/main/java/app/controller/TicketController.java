@@ -63,7 +63,7 @@ public class TicketController {
 			if (!verifyUser(token, "user"))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 //			Long userId = 
-			
+			// leksa kidamo
 
 			return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
 		} catch(Exception e) {
