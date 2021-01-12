@@ -21,4 +21,7 @@ public interface LetRepository extends JpaRepository<Let, Long> {
 	
 	@Query("select let from Let let where let.id = :id")
 	Let findById(long id);
+	
+	@Query("select cena from Let let where let.id = :id")
+	Double findCenaById(long id);
 }

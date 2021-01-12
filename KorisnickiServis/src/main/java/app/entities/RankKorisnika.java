@@ -4,8 +4,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
-import javax.persistence.PrimaryKeyJoinColumn;
 
 @Entity
 public class RankKorisnika {
@@ -25,15 +23,12 @@ public class RankKorisnika {
 	public long getId() {
 		return id;
 	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
 	public String getNaziv() {
 		return naziv;
 	}
-
 	public void setNaziv(String naziv) {
 		this.naziv = naziv;
 	}
@@ -41,11 +36,9 @@ public class RankKorisnika {
 	public long getPoeni() {
 		return poeni;
 	}
-
 	public void setPoeni(long poeni) {
 		this.poeni = poeni;
 	}
-	
 	@Override
 	public String toString() {
 		return naziv;

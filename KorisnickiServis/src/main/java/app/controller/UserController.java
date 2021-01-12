@@ -25,7 +25,10 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import app.entities.KreditnaKartica;
 import app.entities.RankKorisnika;
+import app.entities.RankType;
+import app.entities.User;
 import app.entities.UserClient;
+import app.forms.FlightForm;
 import app.forms.KarticaForm;
 import app.forms.RankForm;
 import app.forms.RegistrationForm;
@@ -168,7 +171,40 @@ public class UserController {
 		}
 		return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
 	}
+	
+	
+	@PostMapping("/updateMiles/{poeni}")
+	public ResponseEntity<String> updateMiles(@RequestHeader(value = HEADER_STRING) String token,
+			@PathVariable Integer points) {
+		try {
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 
+			String stari = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
+					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
+			UserClient user = userRepo.findByEmail(stari);
+			RankKorisnika rank = userRepo.findRankKorisnika(user);
+			
+			if (user == null)
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+
+			rank.setPoeni(rank.getPoeni() + points);
+			if (rank.getPoeni() < 1000)
+				rank.setNaziv(RankType.BRONZA);
+			if (rank.getPoeni() >= 1000 && rank.getPoeni() < 10000)
+				rank.setNaziv(RankType.SREBRO);
+			if (rank.getPoeni() >= 10000)
+				rank.setNaziv(RankType.ZLATO);
+			
+			rankRepo.save(rank);
+
+			return new ResponseEntity<String>("success", HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
 	@PostMapping("/updateRank")
 	public ResponseEntity<String> updateRank(@RequestHeader(value = HEADER_STRING) String token,
 			@RequestBody RankForm rankForm) {
@@ -258,5 +294,31 @@ public class UserController {
 		if (userRepo.existsByEmail(user))
 			return true;
 		return false;
+	}
+	
+	@PostMapping("/buyTicket")
+	public ResponseEntity<Object> buyTicket(@RequestHeader(value = HEADER_STRING) String token, @RequestBody FlightForm flightForm) {
+		try {
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			String mail = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
+					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
+			User user = userRepo.findByEmail(mail);
+			Long userId = user.getId();
+			RankKorisnika rank = userRepo.findRankKorisnika((UserClient) user);
+			String userRank = rank.getNaziv();
+			
+			if (flightForm.getCardId() == null || flightForm.getCardId() == 0)
+				return new ResponseEntity<Object>("Please choose your credit card.", HttpStatus.BAD_REQUEST);
+			
+			FlightForm body = flightForm;
+			flightForm.setUserId(userId);
+			flightForm.setUserRank(userRank);
+			
+			return UtilsMethods.sendPost("http://localhost:8082/buyTicket", body, Map.of("Authorization", token));
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
 	}
 }

@@ -1,6 +1,5 @@
 package app.repository;
 
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -17,9 +16,7 @@ public interface UserRepository extends JpaRepository<UserClient, Long>{
 	
 	@Query("select u.rankKorisnika from UserClient u where u = :user")
 	RankKorisnika findRankKorisnika(UserClient user);
-
-
+	
 	@Query("select u from UserClient u where u.id = :id")
 	UserClient findById(long id);
-	
 }

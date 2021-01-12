@@ -5,12 +5,12 @@ public class LetForm {
 	private long avionid;
 	private String pocetnaDestinacija;
 	private String krajnjaDestinacija;
-	private String duzinaLeta;
+	private Double duzinaLeta;
 	private double cena;
 
 	public LetForm() {}
 	
-	public LetForm( String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, double cena) {
+	public LetForm( String pocetnaDestinacija, String krajnjaDestinacija, Double duzinaLeta, double cena) {
 		this.pocetnaDestinacija = pocetnaDestinacija;
 		this.krajnjaDestinacija = krajnjaDestinacija;
 		this.duzinaLeta = duzinaLeta;
@@ -25,11 +25,11 @@ public class LetForm {
 		this.pocetnaDestinacija = pocetnaDestinacija;
 	}
 
-	public String getDuzinaLeta() {
+	public Double getDuzinaLeta() {
 		return duzinaLeta;
 	}
 
-	public void setDuzinaLeta(String duzinaLeta) {
+	public void setDuzinaLeta(Double duzinaLeta) {
 		this.duzinaLeta = duzinaLeta;
 	}
 
