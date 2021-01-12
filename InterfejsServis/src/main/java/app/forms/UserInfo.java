@@ -8,6 +8,7 @@ public class UserInfo {
 	private String rankPoeni;
 	private String email;
 	private String pasos;
+	private long id;
 	
 	public UserInfo() {
 	}
@@ -68,6 +69,14 @@ public class UserInfo {
 
 	public void setRankPoeni(String rankPoeni) {
 		this.rankPoeni = rankPoeni;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 
 }

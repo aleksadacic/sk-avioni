@@ -12,10 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,14 +26,16 @@ import app.forms.CreditCard;
 import app.forms.EditProfileForm;
 import app.forms.Let;
 import app.forms.LoginForm;
+import app.forms.NewLetForm;
 import app.forms.UserInfo;
-import app.tools.CustomValidation;
 import app.utils.CustomTools;
 import app.utils.UtilsMethods;
 
 @Controller
 @RequestMapping("")
 public class ViewController {
+	
+	private boolean admin = false;
 
 	
 	@GetMapping("/login")
@@ -62,16 +65,25 @@ public class ViewController {
 	@GetMapping("")
 	public String homepage(Model model) {
 		try {
-			UserInfo info = fillUserInfo(token); //error
-			if (info.getEmail().equals("admin"))
-				return "admin-page";
-			else {
-				model.addAttribute("fullname", info.getIme() + " " + info.getPrezime());
+			UserInfo info = fillUserInfo(token);
+			if (info.getEmail().equals("admin")) {
+				admin = true;
 				List<Let> letovi = getFlights(token);
 				model.addAttribute("flights", letovi);
+				List<Avion> avioni = getPlanes(token);
+				model.addAttribute("planes", avioni);
+				model.addAttribute("noviLet", new NewLetForm());
+				model.addAttribute("noviAvion", new Avion());
+				model.addAttribute("flight", new String());
+				return "adminindex";
+			}
+			else {
+				List<Let> letovi = getFlights(token);
+				model.addAttribute("flights", letovi);
+				model.addAttribute("fullname", info.getIme() + " " + info.getPrezime());
 				List<CreditCard> kartice = getCreditCards(token);
 				model.addAttribute("cards", kartice);
-				int discount = CustomTools.calculateDiscount(info.getRankNaziv());
+				int discount = CustomTools.calculateDiscount(info.getRankNaziv()); //mozda alya radi
 				model.addAttribute("discount", discount);
 				return "index";
 			}			
@@ -121,12 +133,69 @@ public class ViewController {
 	
 	@PostMapping("/submitEditProfile")
 	public String submitProfile(@ModelAttribute EditProfileForm updated) {
+		
+		//logika fali!!
 		return "redirect:editProfile";
+	}
+	
+	
+	@PostMapping("/addNewFlight")
+	public String addNewFlight(@ModelAttribute NewLetForm noviLet) {
+		try {
+			System.out.println("view " + noviLet.getAvionid());
+			ResponseEntity<Object> res = UtilsMethods.sendPost("http://localhost:8080/admin/dodajLet", noviLet, Map.of("Authorization", token));
+			if (!res.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+				throw new Exception();
+			}
+			return "redirect:";
+		} catch (Exception e) {
+			return "redirect:";
+		}
+	}
+	
+	@GetMapping("/deleteFlight/{flight}")
+	public String deleteFlight(@PathVariable String flight) {
+		try {
+			ResponseEntity<Object> res = UtilsMethods.sendGet("http://localhost:8080/admin/obrisiLet/" + flight, Map.of("Authorization", token));
+			if (!res.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+				throw new Exception();
+			}
+			return "redirect:../";
+		} catch (Exception e) {
+			return "redirect:../";
+		}
+	}
+	
+	@PostMapping("/addNewPlane")
+	public String addNewPlane(@ModelAttribute Avion noviAvion) {
+		try {
+			ResponseEntity<Object> res = UtilsMethods.sendPost("http://localhost:8080/admin/dodajAvion", noviAvion, Map.of("Authorization", token));
+			if (!res.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+				throw new Exception();
+			}
+			return "redirect:";
+		} catch (Exception e) {
+			return "redirect:";
+		}
+	}
+	
+	@GetMapping("/deletePlane/{plane}")
+	public String deletePlane(@PathVariable String plane) {
+		try {
+			ResponseEntity<Object> res = UtilsMethods.sendGet("http://localhost:8080/admin/obrisiAvion/" + plane, Map.of("Authorization", token));
+			if (!res.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+				throw new Exception();
+			}
+			return "redirect:../";
+		} catch (Exception e) {
+			return "redirect:../";
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
 	private UserInfo fillUserInfo(String token) {
 		ResponseEntity<Object> type = UtilsMethods.sendGet("http://localhost:8080/verify/usertype", Map.of("Authorization", token)); //error
+		System.out.println(type.getBody().toString());
 		if (!type.getStatusCode().equals(HttpStatus.ACCEPTED)) {
 			return null;
 		}
@@ -145,14 +214,22 @@ public class ViewController {
 				info.setRankPoeni(entry.getValue());
 			if (entry.getKey().equals("rankNaziv"))
 				info.setRankNaziv(entry.getValue());
+			if (entry.getKey().equals("id"))
+				info.setId(Long.parseLong(entry.getValue()));
 		}
 		return info;
 	}
 	
 	@SuppressWarnings("unchecked")
 	private List<Let> getFlights(String token) {
-		ResponseEntity<Object> get = UtilsMethods.sendGet("http://localhost:8080/sviLetovi", Map.of("Authorization", token));
-		if (!get.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+		ResponseEntity<Object> get = null;
+		if (admin) {
+			get = UtilsMethods.sendGet("http://localhost:8080/admin/sviLetoviAdmin", Map.of("Authorization", token));
+		}
+		else {
+			get = UtilsMethods.sendGet("http://localhost:8080/sviLetovi", Map.of("Authorization", token));	
+		}
+		if (get == null || !get.getStatusCode().equals(HttpStatus.ACCEPTED)) {
 			return null;
 		}
 		List<Object> svi = (List<Object>)get.getBody();
@@ -179,10 +256,36 @@ public class ViewController {
 					let.setDuzinaLeta(Long.parseLong(entry.getValue().toString()));
 				if (entry.getKey().equals("cena"))
 					let.setCena((double) entry.getValue());
+				if (entry.getKey().equals("id"))
+					let.setId(Long.parseLong(entry.getValue().toString()));
 			}
 			letovi.add(let);
 		}
 		return letovi;	
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<Avion> getPlanes(String token) {
+		ResponseEntity<Object> get = UtilsMethods.sendGet("http://localhost:8080/admin/sviAvioni", Map.of("Authorization", token));
+		if (!get.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+			return null;
+		}
+		List<Object> svi = (List<Object>)get.getBody();
+		List<Avion> avioni = new ArrayList<Avion>();
+		for (Object s : svi) {
+			Avion avion = new Avion();
+			LinkedHashMap<String, Object> str = (LinkedHashMap<String, Object>) s;
+			for (Entry<String, Object> ug :  str.entrySet()) {
+				if (ug.getKey().equals("naziv"))
+					avion.setNaziv((String) ug.getValue());
+				if (ug.getKey().equals("kapacitet"))
+					avion.setKapacitet((int) ug.getValue());
+				if (ug.getKey().equals("id"))
+					avion.setId(Long.parseLong(ug.getValue().toString()));
+			}
+			avioni.add(avion);
+		}
+		return avioni;	
 	}
 	
 	@SuppressWarnings("unchecked")

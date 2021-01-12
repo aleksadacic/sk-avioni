@@ -2,7 +2,7 @@ package app.forms;
 
 public class LetForm {
 	
-	private long avion;
+	private long avionid;
 	private String pocetnaDestinacija;
 	private String krajnjaDestinacija;
 	private String duzinaLeta;
@@ -49,12 +49,12 @@ public class LetForm {
 		this.krajnjaDestinacija = krajnjaDestinacija;
 	}
 
-	public long getAvion() {
-		return avion;
+	public long getAvionid() {
+		return avionid;
 	}
 
-	public void setAvion(long avion) {
-		this.avion = avion;
+	public void setAvionid(long avionid) {
+		this.avionid = avionid;
 	}
 
 }

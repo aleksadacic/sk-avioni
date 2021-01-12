@@ -62,9 +62,20 @@ public class VerificationController {
 			String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build()
 					.verify(token.replace(TOKEN_PREFIX, "")).getSubject();
 			UserInfo rf = new UserInfo();
-			User x = userRepo.findByEmail(user);
+			User x = null;
+			x = userRepo.findByEmail(user);
+			if (x == null) {
+				x = adminRepo.findByEmail(user);
+			}
+			if (x == null)
+				throw new Exception();
 			if (adminRepo.existsByEmail(user)) {
 				rf.setEmail(x.getEmail());
+				rf.setIme("");
+				rf.setPrezime("");
+				rf.setPasos("");
+				rf.setRankNaziv("");
+				rf.setRankPoeni("");
 			}
 			else if (userRepo.existsByEmail(user)) {
 				UserClient uc = (UserClient)x;

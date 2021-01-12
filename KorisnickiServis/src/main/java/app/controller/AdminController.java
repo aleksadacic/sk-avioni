@@ -70,7 +70,7 @@ public class AdminController {
 	}
 	
 	@PostMapping("/dodajLet")
-	public ResponseEntity<Object> dodajLet(@RequestHeader(value = HEADER_STRING) String token, LetForm form) {
+	public ResponseEntity<Object> dodajLet(@RequestHeader(value = HEADER_STRING) String token, @RequestBody LetForm form) {
 		try {
 			if (!authorityCheck(token))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
@@ -86,6 +86,40 @@ public class AdminController {
 			if (!authorityCheck(token))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			return UtilsMethods.sendGet("http://localhost:8081/letovi/obrisiLet/" + let, Map.of("Authorization", token));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/sviLetoviAdmin")
+	public ResponseEntity<Object> sviLetoviAdmin(@RequestHeader(value = HEADER_STRING) String token) {
+		try {
+			
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/sviLetoviAdmin",
+					Map.of("Authorization", token));
+			
+			return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/sviAvioni")
+	public ResponseEntity<Object> sviAvioni(@RequestHeader(value = HEADER_STRING) String token) {
+		try {
+			
+			if (!authorityCheck(token))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			ResponseEntity<Object> response = UtilsMethods.sendGet("http://localhost:8081/letovi/sviAvioni",
+					Map.of("Authorization", token));
+			
+			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

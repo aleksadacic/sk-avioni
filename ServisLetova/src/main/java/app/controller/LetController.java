@@ -53,6 +53,33 @@ public final class LetController {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 	}
+	
+	@GetMapping("/sviLetoviAdmin")
+	public ResponseEntity<List<Let>> sviLetoviAdmin(@RequestHeader(value = "Authorization") String token) {
+		try {
+			if (!verifyUser(token, "admin"))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			List<Let> letovi = letRepo.findAll();
+			return new ResponseEntity<List<Let>>(letovi, HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
+	
+	@GetMapping("/sviAvioni")
+	public ResponseEntity<List<Avion>> sviAvioni(@RequestHeader(value = "Authorization") String token) {
+		try {
+			if (!verifyUser(token, "admin"))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			
+			List<Avion> letovi = avionRepo.findAll();
+			return new ResponseEntity<List<Avion>>(letovi, HttpStatus.ACCEPTED);
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+	}
 
 	//mzoda posenbno svi parametri..
 	@GetMapping("/pretraga/{query}")
@@ -110,7 +137,7 @@ public final class LetController {
 			if (!verifyUser(token, "admin"))
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			
-			Avion avion = avionRepo.findById(form.getAvion());
+			Avion avion = avionRepo.findById(form.getAvionid());
 			Let let = new Let(avion, form.getPocetnaDestinacija(), form.getKrajnjaDestinacija(), Long.parseLong(form.getDuzinaLeta()), form.getCena());
 			let = letRepo.save(let);
 			return new ResponseEntity<Let>(let, HttpStatus.ACCEPTED);

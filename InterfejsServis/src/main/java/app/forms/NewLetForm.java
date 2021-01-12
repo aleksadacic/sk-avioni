@@ -1,22 +1,43 @@
 package app.forms;
 
-public class LetForm {
+public class NewLetForm {
+
+	private long id;
 	
-	private long avionid;
 	private String pocetnaDestinacija;
 	private String krajnjaDestinacija;
 	private String duzinaLeta;
-	private double cena;
-
-	public LetForm() {}
+	private String avionid;
+	private String cena;
 	
-	public LetForm( String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, double cena) {
+	public NewLetForm() {}
+	
+	public NewLetForm(String avionid, String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, String cena) {
+		super();
+		this.avionid = avionid;
 		this.pocetnaDestinacija = pocetnaDestinacija;
 		this.krajnjaDestinacija = krajnjaDestinacija;
 		this.duzinaLeta = duzinaLeta;
 		this.cena = cena;
 	}
 	
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getAvionid() {
+		return avionid;
+	}
+
+	public void setAvionid(String avionid) {
+		this.avionid = avionid;
+	}
+
 	public String getPocetnaDestinacija() {
 		return pocetnaDestinacija;
 	}
@@ -33,11 +54,11 @@ public class LetForm {
 		this.duzinaLeta = duzinaLeta;
 	}
 
-	public double getCena() {
+	public String getCena() {
 		return cena;
 	}
 
-	public void setCena(double cena) {
+	public void setCena(String cena) {
 		this.cena = cena;
 	}
 	
@@ -47,14 +68,6 @@ public class LetForm {
 
 	public void setKrajnjaDestinacija(String krajnjaDestinacija) {
 		this.krajnjaDestinacija = krajnjaDestinacija;
-	}
-
-	public long getAvionid() {
-		return avionid;
-	}
-
-	public void setAvionid(long avionid) {
-		this.avionid = avionid;
 	}
 
 }
