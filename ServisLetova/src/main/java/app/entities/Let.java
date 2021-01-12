@@ -6,7 +6,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 @Entity
 public class Let {
@@ -21,8 +20,8 @@ public class Let {
 	
 	private String pocetnaDestinacija;
 	private String krajnjaDestinacija;
-	private String duzinaLeta;
-	private double cena;
+	private Double duzinaLeta;
+	private Double cena;
 	
 	//dodatni parametri
 	private int prodateKarte;
@@ -30,7 +29,7 @@ public class Let {
 	
 	public Let() {}
 	
-	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestinacija, String duzinaLeta, double cena) {
+	public Let(Avion avion, String pocetnaDestinacija, String krajnjaDestinacija, Double duzinaLeta, double cena) {
 		super();
 		this.avion = avion;
 		this.pocetnaDestinacija = pocetnaDestinacija;
@@ -41,67 +40,51 @@ public class Let {
 		this.ponisten = false;
 	}
 	
-
 	public long getId() {
 		return id;
 	}
-
 	public void setId(long id) {
 		this.id = id;
 	}
-
 	public Avion getAvion() {
 		return avion;
 	}
-
 	public void setAvion(Avion avion) {
 		this.avion = avion;
 	}
-
 	public String getPocetnaDestinacija() {
 		return pocetnaDestinacija;
 	}
-
 	public void setPocetnaDestinacija(String pocetnaDestinacija) {
 		this.pocetnaDestinacija = pocetnaDestinacija;
 	}
-
-	public String getDuzinaLeta() {
+	public Double getDuzinaLeta() {
 		return duzinaLeta;
 	}
-
-	public void setDuzinaLeta(String duzinaLeta) {
+	public void setDuzinaLeta(Double duzinaLeta) {
 		this.duzinaLeta = duzinaLeta;
 	}
-
 	public double getCena() {
 		return cena;
 	}
-
 	public void setCena(double cena) {
 		this.cena = cena;
 	}
-	
 	public String getKrajnjaDestinacija() {
 		return krajnjaDestinacija;
 	}
-
 	public void setKrajnjaDestinacija(String krajnjaDestinacija) {
 		this.krajnjaDestinacija = krajnjaDestinacija;
 	}
-
 	public int getProdateKarte() {
 		return prodateKarte;
 	}
-
 	public void setProdateKarte(int prodateKarte) {
 		this.prodateKarte = prodateKarte;
 	}
-
 	public boolean isPonisten() {
 		return ponisten;
 	}
-
 	public void setPonisten(boolean ponisten) {
 		this.ponisten = ponisten;
 	}
@@ -110,5 +93,5 @@ public class Let {
 	public String toString() {
 		return pocetnaDestinacija + "-" + krajnjaDestinacija;
 	}
-
+	
 }

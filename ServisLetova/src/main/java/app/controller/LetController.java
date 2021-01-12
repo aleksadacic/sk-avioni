@@ -67,6 +67,67 @@ public final class LetController {
 		}
 	}
 	
+	@GetMapping("/findPrice/{query}")
+	public ResponseEntity<Double> findPrice(@RequestHeader(value = "Authorization") String token, @PathVariable String query) {
+		try {
+			if (!verifyUser(token, "user"))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			List<Let> letovi = null;
+			if (!query.isEmpty())
+				letovi = letRepo.findByAny(query);
+			
+			if (letovi != null)
+				return new ResponseEntity<Double>(letovi.get(0).getCena(), HttpStatus.ACCEPTED);
+			
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		}
+	}
+	
+	@GetMapping("/exists/{query}")
+	public ResponseEntity<Boolean> exists(@RequestHeader(value = "Authorization") String token, @PathVariable String query) {
+		try {
+			if (!verifyUser(token, "user"))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			List<Let> letovi = null;
+			if (!query.isEmpty())
+				letovi = letRepo.findByAny(query);
+			
+			if (letovi != null)
+				return new ResponseEntity<Boolean>(true, HttpStatus.ACCEPTED);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		}
+	}
+	
+	
+	@GetMapping("/isFull/{query}")
+	public ResponseEntity<Boolean> isFull(@RequestHeader(value = "Authorization") String token, @PathVariable String query) {
+		try {
+			if (!verifyUser(token, "user"))
+				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+			
+			List<Let> letovi = null;
+			if (!query.isEmpty())
+				letovi = letRepo.findNotFull();
+			else
+				letovi = letRepo.findAll();
+			
+			for(Let l : letovi) {
+				if (l.getId() == Long.parseLong(query)) {
+					return new ResponseEntity<Boolean>(false, HttpStatus.ACCEPTED);
+				}
+			}
+			return new ResponseEntity<Boolean>(true, HttpStatus.BAD_REQUEST);		
+		} catch (Exception e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);		
+		}
+	}
+	
 	@PostMapping("/dodajAvion")
 	public ResponseEntity<Avion> dodajAvion(@RequestHeader(value = "Authorization") String token, @RequestBody AvionForm form) {
 		try {
